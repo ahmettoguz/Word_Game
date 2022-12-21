@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Font Awasome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+      integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <!-- ------- -->
+
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap"
+      rel="stylesheet"
+    />
+    <!-- ------- -->
+
+    <!-- jquery -->
+    <script src="./assets/js/jquery.min.js"></script>
+    <!-- ------- -->
+
+    <!-- jquery ui -->
+    <script
+      src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
+      integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0="
+      crossorigin="anonymous"
+    ></script>
+    <!-- ------- -->
+    <script src="./assets/js/functions.js"></script>
+    <title>Word Game</title>
+  </head>
+ 
+  <body>
+    <div id="playArea">
+      <h2>Ahmet Oğuz Ergin</h2>
+
+      <div id="wordContainer"></div>
+      <div id="hintBox"><i class="fa-solid fa-lightbulb"></i></div>
+      <div id="writtenWord"></div>
+      <!-- <i class="fas fa-lightbulb-on"></i> -->
+      <div id="letterContainer">
+        <p></p>
+        <p></p>
+        <p></p>
+        <i class="fa-solid fa-shuffle shuffleIcon"></i>
+        <p></p>
+        <p></p>
+        <p></p>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script>
+  $(function () {
+    let letters = ["E", "N", "E", "R", "G", "Y"];
+    let trueWords = ["GREEN", "ENERGY", "GENRE", "GENE", "EYE"];
+    let openedWords = [];
+    let wordContainer = $("#wordContainer");
+    let writtenWord = $("#writtenWord");
+
+    addWordBoxesWithLetters(wordContainer);
+    placeLetters(letters);
+
+    // shuffle click
+    $(".shuffleIcon").click(function () {
+      // check if there is any selected letter
+      if (checkIsSelected()) $(this).effect("shake");
+      else placeLetters(letters);
+    });
+
+    // letter click
+    $("#letterContainer > p").mousedown(function (event) {
+      switch (event.which) {
+        case 1: //left click
+          // show the Bar
+          writtenWord.css("opacity", 1);
+
+          // if not clicked before
+          if (!$(this).hasClass("selected")) {
+            // add to written word
+            let str = writtenWord.html();
+            str += $(this).html();
+            writtenWord.html(str);
+
+            $(this).addClass("selected");
+          } else {
+            // bounce effect
+            $(this).effect("bounce");
+          }
+          break;
+      }
+    });
+
+    // submit word by right click
+    $("#letterContainer").mousedown(function (event) {
+      switch (event.which) {
+        case 3:
+          // check word
+          if (trueWords.includes(writtenWord.html())) {
+            if (openedWords.includes(writtenWord.html())) {
+              pulsateOpenedWord(writtenWord.html());
+
+              // shake writtenWord
+              writtenWord.effect("shake");
+            } else openWord(writtenWord.html(), openedWords);
+          } else {
+            // shake writtenWord
+            writtenWord.effect("shake");
+          }
+
+          setTimeout(() => {
+            //   remove selected elements
+            $(" #letterContainer > p").removeClass("selected");
+
+            // remove written word bar and itself
+            writtenWord.css("opacity", 0);
+            writtenWord.html("");
+          }, 500);
+          break;
+      }
+    });
+
+    // hint click
+    $("#hintBox").click(function () {
+      $(".wordBox").each(function () {
+        if (!$(this).hasClass("hiddenBox") && !$(this).hasClass("opened"))
+          $(this).animate({ color: "teal" }, 1000);
+        setTimeout(() => {
+          $(this).animate({ color: "white" }, 1000);
+        }, 1100);
+      });
+    });
+
+    // disable context menu on right click
+    $("body").contextmenu(function () {
+      return false;
+    });
+  });
+</script>
