@@ -1,1 +1,1 @@
-# frontend-word-game
+# frontend word game
